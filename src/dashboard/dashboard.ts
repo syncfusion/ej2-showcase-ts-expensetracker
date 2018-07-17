@@ -659,7 +659,7 @@ function InitializeComponet(): void {
                 field: 'Amount',
                 headerText: 'Amount',
                 width: 120,
-                textAlign: 'right',
+                textAlign: 'Right',
                 template: '#amtTemplate',
             }
         ]
