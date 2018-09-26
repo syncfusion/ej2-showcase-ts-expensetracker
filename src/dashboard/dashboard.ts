@@ -355,7 +355,7 @@ function DateRange(): void {
         startDate: window.startDate,
         endDate: window.endDate,
         showClearButton: false,
-        readonly: true,
+        allowEdit: false,
         presets: [
             { label: 'Last Month', start: new Date('10/1/2017'), end: new Date('10/31/2017') },
             { label: 'Last 3 Months', start: new Date('9/1/2017'), end: new Date('11/30/2017') },
