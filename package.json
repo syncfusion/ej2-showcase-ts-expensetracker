@@ -6,6 +6,7 @@
   "license": "SEE LICENSE IN license",
   "dependencies": {
     "@syncfusion/ej2-base": "*",
+    "@syncfusion/ej2-icons": "*",
     "@syncfusion/ej2-buttons": "*",
     "@syncfusion/ej2-calendars": "*",
     "@syncfusion/ej2-charts": "*",
