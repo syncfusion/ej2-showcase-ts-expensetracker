@@ -1,7 +1,7 @@
 {
-  "name": "@syncfusion/ej2-typescript-sample_template",
+  "name": "@syncfusion/ej2-ts-expense-tracker",
   "version": "1.0.0",
-  "description": "Essential JS 2 - Sample name",
+  "description": "Essential JS 2 - Expense Tracker",
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production",
