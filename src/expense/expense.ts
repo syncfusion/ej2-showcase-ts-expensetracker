@@ -5,7 +5,7 @@ import { DateRangePicker, DatePicker, TimePicker, RangeEventArgs } from '@syncfu
 import { DataManager, Query, Predicate } from '@syncfusion/ej2-data';
 import { Grid, Page, Edit, Toolbar, CommandColumn, ContextMenu, Resize, CheckBoxChangeEventArgs } from '@syncfusion/ej2-grids';
 import { Button, CheckBox, RadioButton, ChangeArgs } from '@syncfusion/ej2-buttons';
-import { Dialog, Tooltip } from '@syncfusion/ej2-popups';
+import { CloseEventArgs, Dialog, OpenEventArgs, Tooltip } from '@syncfusion/ej2-popups';
 import { DropDownList, MultiSelect } from '@syncfusion/ej2-dropdowns';
 import { NumericTextBox, Input } from '@syncfusion/ej2-inputs';
 import { Ajax, KeyboardEventArgs, isNullOrUndefined as isNOU } from '@syncfusion/ej2-base';
@@ -33,9 +33,9 @@ let creditcard: CheckBox;
 let debitcard: CheckBox;
 let expense: CheckBox;
 let dateRangePickerObject: DateRangePicker;
-let addExpenseDialog: Dialog;
-let editExpenseDialog: Dialog;
-let confirmDialogObj: Dialog;
+let addExpenseDialog: Dialog | null;
+let editExpenseDialog: Dialog | null;
+let confirmDialogObj: Dialog | null;
 let tooltipEdit: Tooltip;
 let tooltipDelete: Tooltip;
 let tooltipHover: boolean;
@@ -55,6 +55,7 @@ let minAmount: any;
 let maxAmount: any;
 let editValue: number;
 let deleteValue: number;
+let dlgContainer: any;
 /* tslint:enable */
 let defaultGrigColumns: Object[] = [
     { type: 'checkbox', width: 40, },
@@ -110,15 +111,15 @@ let defaultGrigColumns: Object[] = [
 
 function onGridRender(): void {
     if (grid) {
-        let editElement: HTMLElement = document.getElementById('grid_edit');
-        let deleteElement: HTMLElement = document.getElementById('grid_delete');
+        let editElement: HTMLElement = document.getElementById('grid_edit') as HTMLElement;
+        let deleteElement: HTMLElement = document.getElementById('grid_delete') as HTMLElement;
         if (editElement) {
-            grid.toolbarModule.toolbar.enableItems(editElement.parentElement, false);
-            editElement.parentElement.title = ' ';
+            grid.toolbarModule.toolbar.enableItems(editElement.parentElement as HTMLElement, false);
+            editElement.parentElement!.title = ' ';
         }
         if (deleteElement) {
-            grid.toolbarModule.toolbar.enableItems(deleteElement.parentElement, false);
-            deleteElement.parentElement.title = ' ';
+            grid.toolbarModule.toolbar.enableItems(deleteElement.parentElement as HTMLElement, false);
+            deleteElement.parentElement!.title = ' ';
         }
         editValue = 0;
         deleteValue = 0;
@@ -127,19 +128,19 @@ function onGridRender(): void {
 
 function onGridCheckBoxChange(args: CheckBoxChangeEventArgs): void {
     if (grid.getSelectedRowIndexes().length > 1) {
-        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_edit').parentElement, false);
-        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_delete').parentElement, true);
+        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_edit')!.parentElement as HTMLElement, false);
+        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_delete')!.parentElement as HTMLElement, true);
         editValue = 2;
         deleteValue = 2;
 
     } else if (grid.getSelectedRowIndexes().length === 0) {
-        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_edit').parentElement, false);
-        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_delete').parentElement, false);
+        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_edit')!.parentElement as HTMLElement, false);
+        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_delete')!.parentElement as HTMLElement, false);
         editValue = 0;
         deleteValue = 0;
     } else if (grid.getSelectedRowIndexes().length === 1) {
-        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_edit').parentElement, true);
-        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_delete').parentElement, true);
+        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_edit')!.parentElement as HTMLElement, true);
+        grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_delete')!.parentElement as HTMLElement, true);
         editValue = 1;
         deleteValue = 1;
     }
@@ -201,11 +202,11 @@ window.expense = (): void => {
     });
     grid.appendTo('#grid');
     if (document.getElementById('grid_edit')) {
-        document.getElementById('grid_edit').onclick = (): void => {
-            let ajax: Ajax = new Ajax('./src/expense/dialog.html', 'GET', true);
+        document.getElementById('grid_edit')!.onclick = (): void => {
+            let ajax: Ajax = new Ajax('dialog.html', 'GET', true);
             ajax.send().then();
             ajax.onSuccess = (data: string): void => {
-                grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_delete').parentElement, true);
+                grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_delete')!.parentElement as HTMLElement, true);
                 if (editExpenseDialog) {
                     editExpenseDialog.show();
                 } else {
@@ -234,7 +235,7 @@ window.expense = (): void => {
         };
     }
     if (document.getElementById('grid_delete')) {
-        document.getElementById('grid_delete').onclick = (): void => {
+        document.getElementById('grid_delete')!.onclick = (): void => {
             confirmDialogObj = new Dialog({
                 header: 'Delete',
                 visible: false,
@@ -257,11 +258,11 @@ window.expense = (): void => {
         };
     }
     function dialogClose(): void {
-        confirmDialogObj.destroy();
+        confirmDialogObj!.destroy();
         confirmDialogObj = null;
     }
     function confirmDlgNoBtnClick(): void {
-        confirmDialogObj.hide();
+        confirmDialogObj!.hide();
     }
     function confirmDlgYesBtnClick(): void {
         let selectedRecords: Object[] = grid.getSelectedRecords();
@@ -274,7 +275,7 @@ window.expense = (): void => {
         });
         grid.refresh();
         cardUpdate();
-        confirmDialogObj.hide();
+        confirmDialogObj!.hide();
     }
 
     let searchKey: HTMLInputElement = document.getElementById('txt') as HTMLInputElement;
@@ -284,12 +285,12 @@ window.expense = (): void => {
             showClearButton: true
         }
     });
-    document.getElementById('searchbtn').onclick = () => {
+    document.getElementById('searchbtn')!.onclick = () => {
         grid.search(searchKey.value);
     };
 
     /** Performs search operation when press Enter key */
-    searchKey.onkeyup = (e: KeyboardEventArgs) => {
+    (searchKey as any).onkeyup = (e: KeyboardEventArgs) => {
         if (e.keyCode === 13) { grid.search(searchKey.value); }
     };
 
@@ -306,11 +307,11 @@ window.expense = (): void => {
         generatePredicate(dateRangePickerObject.startDate, dateRangePickerObject.endDate, '');
     }
 
-    document.getElementById('add-btn').onclick = (): void => {
+    document.getElementById('add-btn')!.onclick = (): void => {
         showAddDialog();
     };
 
-    document.getElementById('addexpense').onclick = (): void => {
+    document.getElementById('addexpense')!.onclick = (): void => {
         showAddDialog();
     };
 
@@ -318,13 +319,13 @@ window.expense = (): void => {
     /* tslint:disable */
     function onGridActionComplete(e: any): void {
         setTimeout(() => {
-            grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_edit').parentElement, false);
+            grid.toolbarModule.toolbar.enableItems(document.getElementById('grid_edit')!.parentElement as HTMLElement, false);
         }, 0);
     }
     /* tslint:enable */
 
     function showAddDialog(): void {
-        let ajax: Ajax = new Ajax('./src/expense/dialog.html', 'GET', true);
+        let ajax: Ajax = new Ajax('dialog.html', 'GET', true);
         ajax.send().then();
         ajax.onSuccess = (data: string): void => {
             if (addExpenseDialog) {
@@ -376,9 +377,9 @@ window.expense = (): void => {
             'UniqueId': editRowData.rowData.UniqueId,
             'DateTime': new Date(datepicker.value.setHours(timepicker.value.getHours())),
             'Category': <string>category.value,
-            'PaymentMode': (cashRadio.checked && cashRadio.label) ||
-            (creditRadio.checked && creditRadio.label) || (debitRadio.checked && debitRadio.label),
-            'TransactionType': (incomeRadio.checked && incomeRadio.label) || (expenseRadio.checked && expenseRadio.label),
+            'PaymentMode': ((cashRadio.checked && cashRadio.label) ||
+            (creditRadio.checked && creditRadio.label) || (debitRadio.checked && debitRadio.label)) as string | number,
+            'TransactionType': (incomeRadio.checked && incomeRadio.label) || (expenseRadio.checked && expenseRadio.label) as string,
             'Description': (<HTMLInputElement>document.getElementById('description')).value,
             'Amount': '' + amount.value
         };
@@ -389,7 +390,7 @@ window.expense = (): void => {
         });
         grid.refresh();
         cardUpdate();
-        editExpenseDialog.hide();
+        editExpenseDialog!.hide();
     }
 
     function addNewTransaction(): void {
@@ -398,8 +399,8 @@ window.expense = (): void => {
             'DateTime': new Date(datepicker.value.setHours(timepicker.value.getHours())),
             'Category': <string>category.value,
             'PaymentMode': (cashRadio.checked && cashRadio.label) ||
-            (creditRadio.checked && creditRadio.label) || (debitRadio.checked && debitRadio.label),
-            'TransactionType': (incomeRadio.checked && incomeRadio.label) || (expenseRadio.checked && expenseRadio.label),
+            (creditRadio.checked && creditRadio.label) || (debitRadio.checked && debitRadio.label) as string | number,
+            'TransactionType': (incomeRadio.checked && incomeRadio.label) || (expenseRadio.checked && expenseRadio.label) as string,
             'Description': (<HTMLInputElement>document.getElementById('description')).value,
             'Amount': '' + amount.value
         };
@@ -420,21 +421,21 @@ window.expense = (): void => {
 
         });
         grid.refresh();
-        addExpenseDialog.hide();
+        addExpenseDialog!.hide();
         cardUpdate();
     }
 
     function onNewDialogCancel(): void {
         (<HTMLElement>document.querySelector('.e-dlg-closeicon-btn')).click();
     }
-    function onNewDialogClose(): void {
-        this.dlgContainer.style.zIndex = '100';
-        addExpenseDialog.destroy();
+    function onNewDialogClose(args: CloseEventArgs): void {
+        args.container.style.zIndex = '100';
+        addExpenseDialog!.destroy();
         addExpenseDialog = null;
     }
 
     function onChange(args: ChangeArgs): void {
-        if (this.element.value === 'Income') {
+        if (args.value === 'Income') {
             category.dataSource = categoryIncomeData;
         } else {
             category.dataSource = categoryExpenseData;
@@ -477,16 +478,16 @@ window.expense = (): void => {
         });
         amount.appendTo('#amount');
     }
-    function alertDialogOpen(): void {
-        this.dlgContainer.style.zIndex = '1000000';
+    function alertDialogOpen(args: OpenEventArgs): void {
+        args.container.style.zIndex = '1000000';
     }
     function onEditDialogClose(): void {
         document.body.style.overflowY = 'auto';
-        editExpenseDialog.destroy();
+        editExpenseDialog!.destroy();
         editExpenseDialog = null;
     }
-    function onEditDialogOpen(): void {
-        this.dlgContainer.style.zIndex = '1000000';
+    function onEditDialogOpen(args: OpenEventArgs): void {
+        args.container.style.zIndex = '1000000';
         document.body.style.overflowY = 'hidden';
         createDialogComponent();
         if (editRowData.rowData.TransactionType === 'Income') {
@@ -511,8 +512,8 @@ window.expense = (): void => {
         amount.value = editRowData.rowData.Amount;
 
     }
-    function onNewDialogOpen(): void {
-        this.dlgContainer.style.zIndex = '1000000';
+    function onNewDialogOpen(args: CloseEventArgs): void {
+        args.container.style.zIndex = '1000000';
         createDialogComponent();
     }
     function generatePredicate(start: Date, end: Date, updater: string): void {
@@ -520,13 +521,13 @@ window.expense = (): void => {
         let predicatesStart: Predicate = new Predicate('DateTime', 'greaterthanorequal', start);
         let predicatesEnd: Predicate = new Predicate('DateTime', 'lessthanorequal', end);
         predicates = predicatesStart.and(predicatesEnd);
-        let predIncome: Predicate;
-        let predExpense: Predicate;
-        let predCash: Predicate;
-        let predDebit: Predicate;
-        let preCredit: Predicate;
-        let preCategory: Predicate;
-        let preCategorys: Predicate;
+        let predIncome: Predicate = new Predicate('TransactionType', 'equal', 'Income');
+        let predExpense: Predicate = new Predicate('TransactionType', 'equal', 'Expense');
+        let predCash: Predicate = new Predicate('PaymentMode', 'equal', 'Cash');
+        let predDebit: Predicate = new Predicate('PaymentMode', 'equal', 'Debit Card');
+        let preCredit: Predicate = new Predicate('PaymentMode', 'equal', 'Credit Card');
+        let preCategory: Predicate = new Predicate('Category', 'equal', 'Food');
+        let preCategorys: Predicate = preCategory;
         minMaxAmount(dateRangePickerObject.startDate, dateRangePickerObject.endDate);
         if (updater === 'dateChange') {
             if (!isNOU(numMinValue) && !isNOU(numMaxValue)) {
@@ -618,8 +619,8 @@ window.expense = (): void => {
         generatePredicate(dateRangePickerObject.startDate, dateRangePickerObject.endDate, '');
     }
     function dateRangeChanged(args?: RangeEventArgs): void {
-        window.startDate = args.startDate;
-        window.endDate = args.endDate;
+        window.startDate = args!.startDate as Date;
+        window.endDate = args!.endDate as Date;
         cardUpdate(true);
         generatePredicate(dateRangePickerObject.startDate, dateRangePickerObject.endDate, 'dateChange');
     }
@@ -645,7 +646,7 @@ window.expense = (): void => {
     });
     multiSelectFilter.appendTo('#expense-category');
     let searchEle: Element = document.getElementsByClassName('e-searcher')[0];
-    searchEle.querySelector('input').setAttribute('readonly', 'true');
+    searchEle.querySelector('input')!.setAttribute('readonly', 'true');
     filterMinAmount = new NumericTextBox({
         cssClass: 'inlineAlign',
         width: '55px',
@@ -689,7 +690,7 @@ window.expense = (): void => {
         }, 10);
     }
 
-    document.getElementById('filterExpense').onclick = (): void => {
+    document.getElementById('filterExpense')!.onclick = (): void => {
         toggleFilterMenu();
     };
 };
