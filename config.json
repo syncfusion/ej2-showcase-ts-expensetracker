@@ -1,4 +1,5 @@
 {
+    "productOwner": "Satheeskumar S",
     "sasslint": ["./styles/**/*.scss"],
     "tslint": ["./src/**/*.ts", "!./src/common/common.data.ts"],
     "styleDependency": ["ej2"],
