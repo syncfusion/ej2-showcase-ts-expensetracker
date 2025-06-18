@@ -2,11 +2,13 @@
  * Expense Tracker
  */
 import { addRoute, bypassed, parse } from 'crossroads';
+import crossroads from 'crossroads';
 import { Ajax, rippleEffect, enableRipple } from '@syncfusion/ej2-base';
 import * as hasher from 'hasher';
 import { isNullOrUndefined, Browser, Internationalization } from '@syncfusion/ej2-base';
 import { expenseData, userInfo, startDate, endDate } from './common/common.data';
 enableRipple(true);
+import '../styles/index.scss';
 
 window.expenseDS = expenseData;
 window.userName = userInfo.FullName;
@@ -46,7 +48,7 @@ function parseDate(date: any) {
 updateDate(expenseData);
 handleResize();
 function getCurrentPage(): string {
-    let currentPage: string;
+    let currentPage: string = "";
     if ((window.location.hash === '#/' + ExpensePage[ExpensePage.dashboard])) {
         currentPage = ExpensePage[ExpensePage.dashboard];
     } else if ((window.location.hash === '#/' + ExpensePage[ExpensePage.expense])) {
@@ -61,16 +63,16 @@ rippleEffect(document.body, { selector: '.ripple-element', rippleFlag: true });
 
 routeDefault();
 let currentPage: string;
-addRoute('/:lang:', () => {
+crossroads.addRoute('/{val}', () => {
     let sample: string = currentPage || getCurrentPage();
     if ((currentPage && currentPage !== '') || (window.location.hash === '#/' + getCurrentPage())) {
-        if (!isNullOrUndefined(document.querySelector('.expense-active-page'))) {
-            document.querySelector('.expense-active-page').classList.remove('expense-active-page');
+        if (!isNullOrUndefined(document.querySelector('.expense-active-page') as HTMLElement)) {
+            document.querySelector('.expense-active-page')!.classList.remove('expense-active-page');
         }
-        let ajaxHTML: Ajax = new Ajax('src/' + sample + '/' + sample + '.html', 'GET', true);
+        let ajaxHTML: Ajax = new Ajax(sample + '.html', 'GET', true);
         ajaxHTML.send().then((value: Object): void => {
-            document.getElementById('content').innerHTML = '';
-            document.getElementById('content').innerHTML = value.toString();
+            document.getElementById('content')!.innerHTML = '';
+            document.getElementById('content')!.innerHTML = value.toString();
             document.body.className = '';
             if ((currentPage === ExpensePage[ExpensePage.dashboard]) ||
                 ('#/' + ExpensePage[ExpensePage.dashboard] === window.location.hash)) {
@@ -89,7 +91,7 @@ addRoute('/:lang:', () => {
             }
         });
     }
-}).rules = { lang: ['dashboard', 'about', 'expense'] };
+});
 bypassed.add((request: string) => {
     let samplePath: string[] = ['dashboard', 'about', 'expense'];
     let hash: string = request.split(' ')[0];
@@ -102,46 +104,47 @@ for (let i: number = 0; i < document.querySelectorAll('li').length; i++) {
     document.querySelectorAll('li')[i].addEventListener('click', hash, false);
 }
 function hash(args: MouseEvent): void {
-    document.getElementById('sidebar-wrapper').classList.remove('close');
-    document.getElementById('overlay').classList.remove('dialog');
-    document.getElementById('overlay').style.background = 'none';
-    if (!isNullOrUndefined(document.querySelector('.expense-active-page'))) {
-        document.querySelector('.expense-active-page').classList.remove('expense-active-page');
+    document.getElementById('sidebar-wrapper')!.classList.remove('close');
+    document.getElementById('overlay')!.classList.remove('dialog');
+    document.getElementById('overlay')!.style.background = 'none';
+    if (!isNullOrUndefined(document.querySelector('.expense-active-page') as HTMLElement)) {
+        document.querySelector('.expense-active-page')!.classList.remove('expense-active-page');
     }
-    (<HTMLElement>args.currentTarget).firstElementChild.classList.add('expense-active-page');
-    hasher.setHash((<HTMLElement>args.currentTarget).firstElementChild.getAttribute('href').split('/')[1]);
+    (<HTMLElement>args.currentTarget).firstElementChild!.classList.add('expense-active-page');
+    hasher.setHash(((<HTMLElement>args.currentTarget).firstElementChild!.getAttribute('href') as string).split('/')[1]);
 }
 
 function routeDefault(): void {
-    addRoute('', () => {
+    crossroads.addRoute('', () => {
         window.location.href = '#/dashboard';
     });
 }
 
 hasher.initialized.add((hashValue: string) => {
-    parse(hashValue);
+    crossroads.parse(hashValue);
 });
 
 hasher.changed.add((hashValue: string) => {
     currentPage = hashValue;
-    parse(hashValue);
+    crossroads.parse(hashValue);
 });
+
 hasher.init();
 
-window.onresize = (args: MouseEvent): void => {
+(window as any).onresize = (args: MouseEvent): void => {
     handleResize();
     if (!Browser.isDevice) {
         if (document.getElementById('sidebar-wrapper') &&
-            document.getElementById('sidebar-wrapper').classList.contains('open')) {
-            document.getElementById('sidebar-wrapper').classList.remove('open');
+            document.getElementById('sidebar-wrapper')!.classList.contains('open')) {
+            document.getElementById('sidebar-wrapper')!.classList.remove('open');
         }
         if (document.getElementById('sidebar-wrapper') &&
-            document.getElementById('sidebar-wrapper').classList.contains('close')) {
-            document.getElementById('sidebar-wrapper').classList.remove('close');
+            document.getElementById('sidebar-wrapper')!.classList.contains('close')) {
+            document.getElementById('sidebar-wrapper')!.classList.remove('close');
         }
         if (document.getElementById('overlay') &&
-            document.getElementById('overlay').classList.contains('dialog')) {
-            document.getElementById('overlay').classList.remove('dialog');
+            document.getElementById('overlay')!.classList.contains('dialog')) {
+            document.getElementById('overlay')!.classList.remove('dialog');
         }
         if ((<HTMLElement>document.getElementsByClassName('filter')[0]) &&
             (<HTMLElement>document.getElementsByClassName('filter')[0]).classList.contains('filter-open')) {
@@ -153,23 +156,23 @@ window.onresize = (args: MouseEvent): void => {
         }
     }
 };
-document.getElementById('menu-toggle').onclick = (): void => {
-    menu = document.getElementById('sidebar-wrapper');
-    overlay = document.getElementById('overlay');
+document.getElementById('menu-toggle')!.onclick = (): void => {
+    menu = document.getElementById('sidebar-wrapper') as HTMLElement;
+    overlay = document.getElementById('overlay') as HTMLElement;
     toggleMenu();
 };
-document.getElementById('filter-toggle').onclick = (): void => {
+document.getElementById('filter-toggle')!.onclick = (): void => {
     toggleFilterMenu();
 };
-document.getElementById('overlay').onclick = (): void => {
-    menu = document.getElementById('sidebar-wrapper');
-    overlay = document.getElementById('overlay');
+document.getElementById('overlay')!.onclick = (): void => {
+    menu = document.getElementById('sidebar-wrapper') as HTMLElement;
+    overlay = document.getElementById('overlay') as HTMLElement;
     handleOverlay();
 };
 (document.getElementsByClassName('nav-list')[0] as HTMLElement).onclick = (args: MouseEvent): void => {
     if ((args.target as HTMLElement).nodeName === 'A') {
-        menu = document.getElementById('sidebar-wrapper');
-        overlay = document.getElementById('overlay');
+        menu = document.getElementById('sidebar-wrapper') as HTMLElement;
+        overlay = document.getElementById('overlay') as HTMLElement;
         handleOverlay();
     }
 };
@@ -205,8 +208,8 @@ function disableOverlay(): void {
 }
 
 export function toggleFilterMenu(): void {
-    menu = document.getElementById('sidebar-wrapper');
-    overlay = document.getElementById('overlay');
+    menu = document.getElementById('sidebar-wrapper') as HTMLElement;
+    overlay = document.getElementById('overlay') as HTMLElement;
     menu.style.zIndex = '10000';
     let filterMenu: Element = document.getElementsByClassName('sidebar-wrapper-filter')[0];
     if (filterMenu.classList.contains('filter-open')) {
@@ -263,4 +266,3 @@ export interface MyWindow extends Window {
     userName: string;
     userFirstName: string;
 }
-
