@@ -81,7 +81,7 @@ export function cardUpdate(toUpdate?: boolean): void {
                 incomeRS += parseInt(incomeD[i].Amount, 0);
             }
             if (document.getElementById('tolincome')) {
-                document.getElementById('tolincome').textContent = window.getCurrencyVal(incomeRS ? incomeRS : 0);
+                document.getElementById('tolincome')!.textContent = window.getCurrencyVal(incomeRS ? incomeRS : 0);
             }
         });
 
@@ -94,13 +94,13 @@ export function cardUpdate(toUpdate?: boolean): void {
                 expenseRS += parseInt(expenseD[i].Amount, 0);
             }
             if (document.getElementById('tolexpense')) {
-                document.getElementById('tolexpense').textContent = window.getCurrencyVal(expenseRS ? expenseRS : 0);
+                document.getElementById('tolexpense')!.textContent = window.getCurrencyVal(expenseRS ? expenseRS : 0);
             }
             if (document.getElementById('current-balance')) {
-                document.getElementById('current-balance').textContent = window.getCurrencyVal(incomeRS - expenseRS);
+                document.getElementById('current-balance')!.textContent = window.getCurrencyVal(incomeRS - expenseRS);
             }
             if (document.getElementById('tolbalance')) {
-                document.getElementById('tolbalance').textContent = window.getCurrencyVal(incomeRS - expenseRS);
+                document.getElementById('tolbalance')!.textContent = window.getCurrencyVal(incomeRS - expenseRS);
             }
         });
 
@@ -108,7 +108,7 @@ export function cardUpdate(toUpdate?: boolean): void {
     let transaction: any = new DataManager(window.expenseDS)
         .executeLocal((new Query().where(predicateStart.and(predicateEnd))));
     if (document.getElementById('toltransaction')) {
-        document.getElementById('toltransaction').textContent = window.getNumberVal(transaction.length);
+        document.getElementById('toltransaction')!.textContent = window.getNumberVal(transaction.length);
     }
 }
 
@@ -214,8 +214,8 @@ function getCoulmnChartIncomeDS(e: any): void {
 
 // tslint:disable-next-line:max-func-body-length
 function onDateRangeChange(args: RangeEventArgs): void {
-    window.startDate = args.startDate;
-    window.endDate = args.endDate;
+    window.startDate = args.startDate as Date;
+    window.endDate = args.endDate as Date;
     lineDS = [];
     lineD = [];
     columnIncomeDS = [];
@@ -223,8 +223,8 @@ function onDateRangeChange(args: RangeEventArgs): void {
     tempChartExpenseDS = [];
     tempChartIncomeDS = [];
     lineD = [];
-    predicateStart = new Predicate('DateTime', 'greaterthanorequal', args.startDate);
-    predicateEnd = new Predicate('DateTime', 'lessthanorequal', args.endDate);
+    predicateStart = new Predicate('DateTime', 'greaterthanorequal', args.startDate as Date);
+    predicateEnd = new Predicate('DateTime', 'lessthanorequal', args.endDate as Date);
     predicate = predicateStart.and(predicateEnd);
     cardUpdate();
     /* tslint:disable */
@@ -413,7 +413,7 @@ function InitializeComponet(): void {
         result: Object;
     }    
     if (document.getElementById('user-name')) {
-        document.getElementById('user-name').textContent = window.userName;
+        document.getElementById('user-name')!.textContent = window.userName;
     }
     cardUpdate();
     /* tslint:disable-next-line */
@@ -582,14 +582,14 @@ function InitializeComponet(): void {
             visible: true
         },
         textRender: (args: IAccTextRenderEventArgs) => {
-            args.series.dataLabel.font.size = getFontSize(pie.initialClipRect.width);
+            args.series.dataLabel!.font!.size = getFontSize(pie.initialClipRect.width);
             pie.animateSeries = true;
             if (args.text.indexOf('Others') > -1) {
                 args.text = 'Others';
             }
         },
         animationComplete: (args: IAccAnimationCompleteEventArgs) => {
-            let element: HTMLElement = document.getElementById('total-expense_datalabel_Series_0');
+            let element: HTMLElement = document.getElementById('total-expense_datalabel_Series_0') as HTMLElement;
             if (!isNOU(element)) { element.style.visibility = 'visible'; }
         }
     });
@@ -607,12 +607,12 @@ function InitializeComponet(): void {
         ],
         load: (args: any) => {
             if (document.getElementById('grid-popup')) {
-                document.getElementById('grid-popup').style.display = "block";
+                document.getElementById('grid-popup')!.style.display = "block";
             }
         },
         dataBound: (args: Object) => {
             if (document.getElementById('grid-popup')) {
-                document.getElementById('grid-popup').style.display = "none";
+                document.getElementById('grid-popup')!.style.display = "none";
             }
         }
     });
@@ -684,7 +684,7 @@ window.dashboard = (): void => {
     });
 };
 function updateChart(): void {
-    let pieContainerObj: HTMLElement = document.getElementById('totalExpense');
+    let pieContainerObj: HTMLElement = document.getElementById('totalExpense') as HTMLElement;
     if (!isNOU(pieContainerObj) && pieContainerObj.offsetWidth < 480) {
         disableChartLabel();
     } else {
@@ -692,12 +692,12 @@ function updateChart(): void {
     }
 }
 function disableChartLabel(): void {
-    pie.series[0].dataLabel.visible = false;
+    pie.series[0].dataLabel!.visible = false;
     pie.dataBind();
     pie.refresh();
 }
 function enableChartLabel(): void {
-    pie.series[0].dataLabel.visible = true;
+    pie.series[0].dataLabel!.visible = true;
     pie.dataBind();
     pie.refresh();
 }
@@ -705,7 +705,7 @@ function formatRangeDate(): void {
     let intl: Internationalization = new Internationalization();
     let dateStart: string = intl.formatDate(dateRangePickerObject.startDate, { skeleton: 'MMMd' });
     let dateEnd: string = intl.formatDate(dateRangePickerObject.endDate, { skeleton: 'MMMd' });
-    document.getElementById('rangeDate').textContent = dateStart + ' - ' + dateEnd;
+    document.getElementById('rangeDate')!.textContent = dateStart + ' - ' + dateEnd;
 }
 export function getTotalExpense(): void {
     expTotal = 0;
