@@ -20,12 +20,13 @@
     "mini-css-extract-plugin": "^2.7.6",
     "sass": "^1.89.2",
     "sass-loader": "^16.0.5",
+    "glob": "^11.0.0",
     "terser-webpack-plugin": "^5.3.9",
     "ts-loader": "^9.4.4",
     "typescript": "^5.1.6",
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^5.2.1"
   },
   "dependencies": {
     "@syncfusion/ej2-base": "*",

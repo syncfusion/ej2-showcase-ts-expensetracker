@@ -697,6 +697,15 @@ window.expense = (): void => {
 
 export function getCategory(start: Date, end: Date): void {
     filterCategory = [];
+    // Update tempData from window.expenseDS to ensure it has the latest data
+    tempData = <IExpense[]>window.expenseDS;
+    
+    // Check if tempData is valid before iterating
+    if (!tempData || !Array.isArray(tempData)) {
+        console.warn('tempData is not available or not an array in getCategory');
+        return;
+    }
+    
     /* tslint:disable-next-line */
     tempData.forEach(item => {
         /* tslint:enable-next-line */

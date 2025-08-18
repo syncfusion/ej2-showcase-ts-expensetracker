@@ -5,9 +5,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const path = require("path");
 
 module.exports = {
-  entry: {
-    index: glob.sync("./src/**/*.ts")
-  },
+  entry: "./src/index.ts",
   target: "web",
   module: {
     rules: [
@@ -24,6 +22,7 @@ module.exports = {
           {
             loader: "sass-loader",
             options: {
+              api: "modern-compiler",
               sassOptions: {
                 //If utilize the syncfusion sass files, then use the following line
                 includePaths: ["node_modules/@syncfusion"],
@@ -65,6 +64,24 @@ module.exports = {
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "dist"),
+    clean: true,
+  },
+  devServer: {
+    static: [
+      {
+        directory: path.join(__dirname, 'dist'),
+      },
+      {
+        directory: path.join(__dirname, 'styles'),
+        publicPath: '/styles',
+      }
+    ],
+    compress: true,
+    port: 9000,
+    hot: true,
+    liveReload: true,
+    open: true,
+    historyApiFallback: true,
   },
   optimization: {
     minimize: true,

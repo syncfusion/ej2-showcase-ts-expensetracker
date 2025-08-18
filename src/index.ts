@@ -9,6 +9,10 @@ import { isNullOrUndefined, Browser, Internationalization } from '@syncfusion/ej
 import { expenseData, userInfo, startDate, endDate } from './common/common.data';
 enableRipple(true);
 import '../styles/index.scss';
+// Import modules to ensure they are bundled
+import './dashboard/dashboard';
+import './expense/expense';
+import './about/about';
 
 window.expenseDS = expenseData;
 window.userName = userInfo.FullName;
@@ -45,6 +49,8 @@ function updateDate(list: any) {
 function parseDate(date: any) {
     return new Date((date).match(/\d+/)[0] * 1);
 }
+
+// Initialize dataSource and window.expenseDS with expenseData
 updateDate(expenseData);
 handleResize();
 function getCurrentPage(): string {

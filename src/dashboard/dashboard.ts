@@ -13,9 +13,9 @@ import {
 AccumulationChart.Inject(AccumulationLegend, PieSeries, AccumulationDataLabel, AccumulationTooltip, AccumulationSelection, ChartAnnotation);
 Chart.Inject(ColumnSeries, Category, Legend, Tooltip, ChartAnnotation, DateTime, Crosshair);
 Chart.Inject(LineSeries, AreaSeries, DateTime, Logarithmic, Legend, Tooltip);
-import { Grid, Page, Toolbar } from '@syncfusion/ej2-grids';
+import { Grid, Page, Toolbar, Sort } from '@syncfusion/ej2-grids';
 
-Grid.Inject(Page, Toolbar);
+Grid.Inject(Page, Toolbar, Sort);
 import { MyWindow, dataSource } from '../index';
 
 export interface IExpense {
@@ -712,6 +712,15 @@ export function getTotalExpense(): void {
     category = [];
     legendData = [];
     let renderingData: IExpenseData[] = [];
+    // Update tempData from window.expenseDS to ensure it has the latest data
+    tempData = <IExpense[]>window.expenseDS;
+    
+    // Check if tempData is valid before iterating
+    if (!tempData || !Array.isArray(tempData)) {
+        console.warn('tempData is not available or not an array');
+        return;
+    }
+    
     /* tslint:disable-next-line */
     tempData.forEach(item => {
         if (item.TransactionType === 'Expense' && window.startDate.valueOf() <= item.DateTime.valueOf()
